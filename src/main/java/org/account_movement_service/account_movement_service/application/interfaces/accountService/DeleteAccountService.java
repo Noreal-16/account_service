@@ -1,0 +1,6 @@
+package org.account_movement_service.account_movement_service.application.interfaces.accountService;
+
+import org.account_movement_service.account_movement_service.application.interfaces.genericService.BaseDeleteService;
+
+public interface DeleteAccountService extends BaseDeleteService {
+}
