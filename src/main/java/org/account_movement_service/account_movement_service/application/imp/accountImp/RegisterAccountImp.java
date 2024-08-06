@@ -21,6 +21,7 @@ public class RegisterAccountImp implements RegisterAccountService {
     @Override
     public Mono<AccountDTO> register(AccountDTO data) {
         AccountsEntity accountsEntity = mapperConvert.toENTITY(data, AccountsEntity.class);
+        accountsEntity.setStatus(true);
         return accountRepository.save(accountsEntity)
                 .map(accountSave -> mapperConvert.toDTO(accountSave, AccountDTO.class));
     }
