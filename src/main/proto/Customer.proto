@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.client_person_service.client_person_service.grpc";
+option java_outer_classname = "CustomerProto";
+
+message CustomerRequire{
+  string id = 1;
+}
+
+message CustomerResponse{
+  string id = 1;
+  string name = 2;
+  string gender = 3;
+  string age = 4;
+  string identification = 5;
+  string direction = 6;
+  string phone = 7;
+  string password = 8;
+  string status = 9;
+  string personId = 10;
+}
+
+service CustomerService{
+  rpc GetInfoCustomer(CustomerRequire) returns (CustomerResponse);
+}
