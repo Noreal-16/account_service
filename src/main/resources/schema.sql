@@ -1,6 +1,6 @@
 create table if not exists accounts (
     id                  SERIAL primary key,
-    account_number      varchar(50) not null ,
+    account_number      varchar(50) not null unique,
     account_type        varchar(10) not null,
     initial_balance     DECIMAL not null ,
     status              boolean default true,

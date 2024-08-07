@@ -6,11 +6,8 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AccountDTO {
-    Long id;
-    String accountNumber;
-    String accountType;
-    Double initialBalance;
-    Boolean status;
-    Long customerId;
+public class TransferDTO {
+    String originAccount;
+    String destinationAccount;
+    Double amount;
 }
