@@ -17,11 +17,8 @@ public class MovementRouter {
     @Bean
     RouterFunction<ServerResponse> routes(MovementsHandler movementsHandler) {
         return RouterFunctions.route()
-                .GET(PATH, movementsHandler::getAllHandler)
-                .GET(PATH + "/{id}", movementsHandler::getInfoHandler)
-                .POST(PATH, movementsHandler::registerHandler)
-                .PUT(PATH + "/{id}", movementsHandler::updateHandler)
-                .DELETE(PATH + "/{id}", movementsHandler::deleteHandler)
+                .POST(PATH + "/deposit", movementsHandler::makeDeposit)
+                .POST(PATH + "/transfer", movementsHandler::makeTransfer)
                 .build();
     }
 

@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.account_movement_service.account_movement_service.application.dto.DepositDTO;
 import org.account_movement_service.account_movement_service.application.dto.MovementDTO;
-import org.account_movement_service.account_movement_service.application.dto.TransferDTO;
-import org.account_movement_service.account_movement_service.application.interfaces.movementService.RegisterMovementService;
+import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeDepositService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
 import org.account_movement_service.account_movement_service.domain.movements.MovementsEntity;
 import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
@@ -22,7 +21,7 @@ import java.util.Date;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RegisterMovementImp implements RegisterMovementService {
+public class MakeDepositImp implements MakeDepositService {
 
     private final MovementRepository movementRepository;
     private final AccountRepository accountRepository;
@@ -45,22 +44,6 @@ public class RegisterMovementImp implements RegisterMovementService {
                 });
     }
 
-    @Override
-    public Mono<MovementDTO> makeTransfer(TransferDTO transferDTO) {
-        return getAccount(transferDTO.getDestinationAccount())
-                .flatMap(existAccount -> {
-                    if (validateAccount(existAccount.getAccountNumber(), transferDTO.getDestinationAccount())){
-                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede realizar transferencia entre la misma cuenta."));
-                    }
-
-                }).then();
-    }
-
-
-
-    private Boolean validateAccount(String originAccount,String destinationAccount) {
-        return destinationAccount.equals(originAccount);
-    }
 
     private Mono<AccountsEntity> getAccount(String accountNumber) {
         return accountRepository.findByAccountNumber(accountNumber).
