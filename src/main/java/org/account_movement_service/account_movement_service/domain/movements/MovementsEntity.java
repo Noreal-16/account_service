@@ -10,12 +10,12 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.Date;
 
 @Data
-@Table
+@Table(name = "MOVEMENTS")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MovementsEntity {
     @Id
     Long id;
-    @Column(value = "MOVEMENT_NUMBER")
+    @Column(value = "MOVEMENT_TYPE")
     String movementType;
     Double balance;
     Double amount;

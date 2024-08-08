@@ -14,6 +14,5 @@ public class MovementDTO {
     String movementType;
     Double balance;
     Double amount;
-    Date date;
     String accountNumber;
 }

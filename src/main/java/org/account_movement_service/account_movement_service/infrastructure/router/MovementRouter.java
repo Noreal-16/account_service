@@ -15,7 +15,7 @@ public class MovementRouter {
     private static final String PATH = "/api/v1/movements";
 
     @Bean
-    RouterFunction<ServerResponse> routes(MovementsHandler movementsHandler) {
+    RouterFunction<ServerResponse> movementsRoutes(MovementsHandler movementsHandler) {
         return RouterFunctions.route()
                 .POST(PATH + "/deposit", movementsHandler::makeDeposit)
                 .POST(PATH + "/transfer", movementsHandler::makeTransfer)

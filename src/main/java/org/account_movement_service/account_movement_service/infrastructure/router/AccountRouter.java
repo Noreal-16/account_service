@@ -14,7 +14,7 @@ public class AccountRouter {
     private static final String PATH = "/api/v1/accounts";
 
     @Bean
-    RouterFunction<ServerResponse> routes(AccountHandler accountHandler) {
+    RouterFunction<ServerResponse> accountRoutes(AccountHandler accountHandler) {
         return RouterFunctions.route()
                 .GET(PATH, accountHandler::getAllHandler)
                 .GET(PATH + "/{id}", accountHandler::getInfoHandler)

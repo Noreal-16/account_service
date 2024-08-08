@@ -2,6 +2,7 @@ package org.account_movement_service.account_movement_service.application.imp.mo
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.account_movement_service.account_movement_service.application.dto.AccountDTO;
 import org.account_movement_service.account_movement_service.application.dto.DepositDTO;
 import org.account_movement_service.account_movement_service.application.dto.MovementDTO;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeDepositService;
@@ -16,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -26,16 +25,17 @@ public class MakeDepositImp implements MakeDepositService {
     private final MovementRepository movementRepository;
     private final AccountRepository accountRepository;
     private final MapperConvert<MovementDTO, MovementsEntity> mapperConvert;
+    private final MapperConvert<AccountDTO, AccountsEntity> accountsEntityMapper;
 
     @Override
     public Mono<MovementDTO> makeDeposit(DepositDTO depositDTO) {
         MovementsEntity movementsEntity = new MovementsEntity();
         return getAccount(depositDTO.getDepositAccount())
                 .flatMap(existAccount -> {
+                    log.info("existAccount: {}", existAccount);
                     movementsEntity.setAccountId(existAccount.getId());
                     movementsEntity.setAmount(depositDTO.getAmount());
                     movementsEntity.setBalance(existAccount.getInitialBalance() + depositDTO.getAmount());
-                    movementsEntity.setDate(new Date());
                     movementsEntity.setMovementType(MovementsEnums.CREDIT.toString());
                     return movementRepository
                             .save(movementsEntity)
@@ -45,9 +45,10 @@ public class MakeDepositImp implements MakeDepositService {
     }
 
 
-    private Mono<AccountsEntity> getAccount(String accountNumber) {
-        return accountRepository.findByAccountNumber(accountNumber).
-                switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta No encontrada : " + accountNumber)));
+    private Mono<AccountDTO> getAccount(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta No encontrada : " + accountNumber)))
+                .map(accountsEntity -> accountsEntityMapper.toDTO(accountsEntity, AccountDTO.class));
     }
 
 }

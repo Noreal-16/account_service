@@ -12,6 +12,6 @@ create table if not exists movements (
     movement_type       varchar(50) not null ,
     balance             DECIMAL  NOT NULL,
     amount              DECIMAL  not null,
-    date                DATE,
+    date                DATE DEFAULT CURRENT_DATE,
     account_id          int not null
     );
