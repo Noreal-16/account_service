@@ -22,9 +22,7 @@ public class GetMovementByAccountIdImp implements GetMovementByAccountIdService 
     @Override
     public Mono<MovementDTO> getMovementByAccountId(Long movementId) {
         return movementRepository.findFirstByAccountIdOrderByDateDesc(movementId)
-                .doOnSuccess(movement -> log.info("Moviemiento encontrado 1 --->: {}", movement))
                 .map(existMovement -> mapperConvert.toDTO(existMovement, MovementDTO.class))
-                .switchIfEmpty(Mono.empty())
-                .doOnError(error -> log.error("Error al obtener movimiento", error));
+                .switchIfEmpty(Mono.empty());
     }
 }

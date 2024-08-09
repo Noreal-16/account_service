@@ -2,6 +2,7 @@ package org.account_movement_service.account_movement_service.infrastructure.grp
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import lombok.SneakyThrows;
 import org.client_person_service.client_person_service.grpc.CustomerRequire;
 import org.client_person_service.client_person_service.grpc.CustomerRequireByAccount;
 import org.client_person_service.client_person_service.grpc.CustomerResponse;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GetInfoCustomerGrpcImp {
@@ -50,4 +52,10 @@ public class GetInfoCustomerGrpcImp {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    @SneakyThrows
+    public void shutdown() {
+        if (channel != null) {
+            channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        }
+    }
 }

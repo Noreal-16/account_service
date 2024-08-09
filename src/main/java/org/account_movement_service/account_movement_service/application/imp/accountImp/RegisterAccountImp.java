@@ -6,12 +6,12 @@ import org.account_movement_service.account_movement_service.application.dto.acc
 import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.RegisterAccountService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
+import org.account_movement_service.account_movement_service.infrastructure.exceptions.CustomException;
 import org.account_movement_service.account_movement_service.infrastructure.grpc.GetInfoCustomerGrpcImp;
 import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
 import org.account_movement_service.account_movement_service.infrastructure.utils.MapperConvert;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -39,7 +39,7 @@ public class RegisterAccountImp implements RegisterAccountService {
                                     return responseDto;
                                 });
                     } else {
-                        return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no se encuentra registrado"));
+                        return Mono.error(new CustomException("Cliente no se encuentra registrado", HttpStatus.NOT_FOUND));
                     }
                 });
     }

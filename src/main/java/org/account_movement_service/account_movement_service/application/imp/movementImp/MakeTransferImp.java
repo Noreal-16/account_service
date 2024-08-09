@@ -11,12 +11,12 @@ import org.account_movement_service.account_movement_service.application.interfa
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.RegisterMovementService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
 import org.account_movement_service.account_movement_service.domain.movements.MovementsEntity;
+import org.account_movement_service.account_movement_service.infrastructure.exceptions.CustomException;
 import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
 import org.account_movement_service.account_movement_service.infrastructure.repository.MovementRepository;
 import org.account_movement_service.account_movement_service.infrastructure.utils.MapperConvert;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -39,7 +39,7 @@ public class MakeTransferImp implements MakeTransferService {
                 .doOnSuccess(account -> log.info("Cuenta encontrada --->: {}", account))
                 .flatMap(originAccount -> {
                     if (validateAccount(originAccount.getAccountNumber(), transferDTO.getDestinationAccount())) {
-                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede realizar transferencia entre la misma cuenta."));
+                        return Mono.error(new CustomException("No se puede realizar transferencia entre la misma cuenta.", HttpStatus.BAD_REQUEST));
                     }
                     return getMovementByAccountId.getMovementByAccountId(originAccount.getId())
                             .defaultIfEmpty(new MovementDTO())
@@ -47,11 +47,11 @@ public class MakeTransferImp implements MakeTransferService {
                                 log.info("lastMovement --->: {}", lastMovement);
                                 Double availableBalance = lastMovement.getId() == null ? originAccount.getInitialBalance() : lastMovement.getBalance();
                                 if (availableBalance < transferDTO.getAmount()) {
-                                    return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo insuficiente. Saldo actual: " + availableBalance));
+                                    return Mono.error(new CustomException("Saldo insuficiente. Saldo actual: " + availableBalance, HttpStatus.BAD_REQUEST));
                                 }
                                 return getAccountNumber.getInfoAccountByAccountNumber(transferDTO.getDestinationAccount()).flatMap(destinationAccount -> {
                                     if (validateAccount(originAccount.getAccountNumber(), transferDTO.getDestinationAccount())) {
-                                        return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede realizar transferencia entre la misma cuenta."));
+                                        return Mono.error(new CustomException("No se puede realizar transferencia entre la misma cuenta.", HttpStatus.BAD_REQUEST));
                                     }
                                     Double newOriginBalance = availableBalance - transferDTO.getAmount();
                                     return getMovementByAccountId.getMovementByAccountId(destinationAccount.getId())
