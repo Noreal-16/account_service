@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import javax.annotation.PostConstruct;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -36,20 +37,25 @@ public class GetInfoCustomerGrpcImp {
 
     public Mono<CustomerResponse> getInfoCustomer(String customerId) {
         return Mono.fromCallable(() -> {
-            CustomerRequire request = CustomerRequire.newBuilder()
-                    .setId(customerId)
-                    .build();
-            return customerServiceStub.getInfoCustomerById(request);
-        }).subscribeOn(Schedulers.boundedElastic());
+                    CustomerRequire request = CustomerRequire.newBuilder()
+                            .setId(customerId)
+                            .build();
+                    return customerServiceStub.getInfoCustomerById(request);
+                }).subscribeOn(Schedulers.boundedElastic()).onErrorResume(e -> Mono.empty())
+                .filter(Objects::nonNull)
+                .switchIfEmpty(Mono.empty());
     }
 
     public Mono<CustomerResponse> getInfoCustomerByIdentification(String identification) {
         return Mono.fromCallable(() -> {
-            CustomerRequireByAccount request = CustomerRequireByAccount.newBuilder()
-                    .setIdentification(identification)
-                    .build();
-            return customerServiceStub.getInfoCustomerByAccount(request);
-        }).subscribeOn(Schedulers.boundedElastic());
+                    CustomerRequireByAccount request = CustomerRequireByAccount.newBuilder()
+                            .setIdentification(identification)
+                            .build();
+                    return customerServiceStub.getInfoCustomerByAccount(request);
+                }).subscribeOn(Schedulers.boundedElastic()).onErrorResume(e -> Mono.empty())
+                .filter(Objects::nonNull)
+                .switchIfEmpty(Mono.empty());
+
     }
 
     @SneakyThrows

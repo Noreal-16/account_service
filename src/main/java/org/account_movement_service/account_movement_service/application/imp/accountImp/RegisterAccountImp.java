@@ -27,6 +27,7 @@ public class RegisterAccountImp implements RegisterAccountService {
     @Override
     public Mono<ResAccountDto> register(AccountDTO data) {
         return getInfoCustomerGrpcImp.getInfoCustomerByIdentification(data.getIdentification())
+                .switchIfEmpty(Mono.error(new CustomException("Cliente no se encuentra registrado", HttpStatus.NOT_FOUND)))
                 .flatMap(customerEntity -> {
                     if (customerEntity != null) {
                         AccountsEntity accountsEntity = mapperAccountConvert.toENTITY(data, AccountsEntity.class);
