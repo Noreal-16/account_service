@@ -23,13 +23,15 @@ public class MovementsHandler {
     public Mono<ServerResponse> makeDeposit(ServerRequest request) {
         Mono<DepositDTO> depositDTOMono = request.bodyToMono(DepositDTO.class);
         return depositDTOMono.flatMap(makeDepositService::makeDeposit)
-                .flatMap(movementDTO -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(movementDTO, DepositDTO.class));
+                .flatMap(movementDTO -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .body(Mono.just(movementDTO), DepositDTO.class));
     }
 
     public Mono<ServerResponse> makeTransfer(ServerRequest request) {
         Mono<TransferDTO> transferDTOMono = request.bodyToMono(TransferDTO.class);
         return transferDTOMono.flatMap(makeTransferService::makeTransfer)
-                .flatMap(movementDTO -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(movementDTO, TransferDTO.class));
+                .flatMap(movementDTO -> ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                        .body(Mono.just(movementDTO), TransferDTO.class));
     }
 
 }

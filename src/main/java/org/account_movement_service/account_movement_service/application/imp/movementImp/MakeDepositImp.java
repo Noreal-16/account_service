@@ -2,19 +2,13 @@ package org.account_movement_service.account_movement_service.application.imp.mo
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.AccountDTO;
 import org.account_movement_service.account_movement_service.application.dto.DepositDTO;
 import org.account_movement_service.account_movement_service.application.dto.MovementDTO;
+import org.account_movement_service.account_movement_service.application.imp.accountImp.GetInfoAccountByAccountNumberImp;
+import org.account_movement_service.account_movement_service.application.interfaces.movementService.GetMovementByAccountIdService;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeDepositService;
-import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
-import org.account_movement_service.account_movement_service.domain.movements.MovementsEntity;
-import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
-import org.account_movement_service.account_movement_service.infrastructure.repository.MovementRepository;
-import org.account_movement_service.account_movement_service.infrastructure.utils.MapperConvert;
-import org.account_movement_service.account_movement_service.infrastructure.utils.enums.MovementsEnums;
-import org.springframework.http.HttpStatus;
+import org.account_movement_service.account_movement_service.application.interfaces.movementService.RegisterMovementService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -22,33 +16,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MakeDepositImp implements MakeDepositService {
 
-    private final MovementRepository movementRepository;
-    private final AccountRepository accountRepository;
-    private final MapperConvert<MovementDTO, MovementsEntity> mapperConvert;
-    private final MapperConvert<AccountDTO, AccountsEntity> accountsEntityMapper;
+    private final RegisterMovementService registerMovementService;
+    private final GetInfoAccountByAccountNumberImp getAccountNumber;
+    private final GetMovementByAccountIdService getMovementByAccountId;
+
 
     @Override
     public Mono<MovementDTO> makeDeposit(DepositDTO depositDTO) {
-        MovementsEntity movementsEntity = new MovementsEntity();
-        return getAccount(depositDTO.getDepositAccount())
-                .flatMap(existAccount -> {
-                    log.info("existAccount: {}", existAccount);
-                    movementsEntity.setAccountId(existAccount.getId());
-                    movementsEntity.setAmount(depositDTO.getAmount());
-                    movementsEntity.setBalance(existAccount.getInitialBalance() + depositDTO.getAmount());
-                    movementsEntity.setMovementType(MovementsEnums.CREDIT.toString());
-                    return movementRepository
-                            .save(movementsEntity)
-                            .map(saveMovement -> mapperConvert.toDTO(saveMovement, MovementDTO.class))
-                            .doOnSuccess(d -> log.info("Movimiento registrado satisfactoriamente"));
-                });
-    }
-
-
-    private Mono<AccountDTO> getAccount(String accountNumber) {
-        return accountRepository.findByAccountNumber(accountNumber)
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta No encontrada : " + accountNumber)))
-                .map(accountsEntity -> accountsEntityMapper.toDTO(accountsEntity, AccountDTO.class));
+        return getAccountNumber.getInfoAccountByAccountNumber(depositDTO.getDepositAccount())
+                .flatMap(existAccount -> getMovementByAccountId.getMovementByAccountId(existAccount.getId())
+                        .defaultIfEmpty(new MovementDTO())
+                        .flatMap(movementExist -> {
+                            Double firstMovementAmount = movementExist.getId() == null ? existAccount.getInitialBalance() : movementExist.getBalance();
+                            Double newBalance = firstMovementAmount + depositDTO.getAmount();
+                            return registerMovementService.registerMovement(existAccount.getId(), depositDTO.getAmount(), newBalance)
+                                    .doOnSuccess(movement -> log.info("Se registro correctamente la transacción"));
+                        }));
     }
 
 }
