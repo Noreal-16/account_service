@@ -2,8 +2,8 @@ package org.account_movement_service.account_movement_service.infrastructure.han
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.DepositDTO;
-import org.account_movement_service.account_movement_service.application.dto.TransferDTO;
+import org.account_movement_service.account_movement_service.application.dto.movementDto.DepositDTO;
+import org.account_movement_service.account_movement_service.application.dto.movementDto.TransferDTO;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeDepositService;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeTransferService;
 import org.springframework.http.MediaType;

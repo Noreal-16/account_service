@@ -4,6 +4,10 @@ option java_multiple_files = true;
 option java_package = "org.client_person_service.client_person_service.grpc";
 option java_outer_classname = "CustomerProto";
 
+message CustomerRequireByAccount{
+  string identification = 1;
+}
+
 message CustomerRequire{
   string id = 1;
 }
@@ -22,5 +26,6 @@ message CustomerResponse{
 }
 
 service CustomerService{
-  rpc GetInfoCustomer(CustomerRequire) returns (CustomerResponse);
+  rpc GetInfoCustomerByAccount(CustomerRequireByAccount) returns (CustomerResponse);
+  rpc GetInfoCustomerById(CustomerRequire) returns (CustomerResponse);
 }

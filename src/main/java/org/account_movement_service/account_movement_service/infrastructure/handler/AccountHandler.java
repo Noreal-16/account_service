@@ -2,7 +2,8 @@ package org.account_movement_service.account_movement_service.infrastructure.han
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.accountDto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.*;
 import org.account_movement_service.account_movement_service.infrastructure.handler.interfaces.BaseHandler;
 import org.springframework.http.MediaType;
@@ -26,15 +27,15 @@ public class AccountHandler implements BaseHandler {
 
     @Override
     public Mono<ServerResponse> getAllHandler(ServerRequest serverRequest) {
-        Flux<AccountDTO> accountDTOFlux = getAllAccountsService.getAll();
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(accountDTOFlux, AccountDTO.class);
+        Flux<ResAccountDto> accountDTOFlux = getAllAccountsService.getAll();
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(accountDTOFlux, ResAccountDto.class);
     }
 
     @Override
     public Mono<ServerResponse> getInfoHandler(ServerRequest serverRequest) {
         Long id = Long.parseLong(serverRequest.pathVariable("id"));
-        Mono<AccountDTO> accountDTOMono = getInfoAccountService.getInfo(id);
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(accountDTOMono, AccountDTO.class);
+        Mono<ResAccountDto> accountDTOMono = getInfoAccountService.getInfo(id);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).body(accountDTOMono, ResAccountDto.class);
     }
 
     @Override

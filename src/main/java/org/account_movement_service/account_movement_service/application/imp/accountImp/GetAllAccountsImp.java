@@ -2,9 +2,10 @@ package org.account_movement_service.account_movement_service.application.imp.ac
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.GetAllAccountsService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
+import org.account_movement_service.account_movement_service.infrastructure.grpc.GetInfoCustomerGrpcImp;
 import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
 import org.account_movement_service.account_movement_service.infrastructure.utils.MapperConvert;
 import org.springframework.stereotype.Service;
@@ -16,12 +17,18 @@ import reactor.core.publisher.Flux;
 public class GetAllAccountsImp implements GetAllAccountsService {
 
     private final AccountRepository accountRepository;
-    private final MapperConvert<AccountDTO, AccountsEntity> mapperConvert;
+    private final MapperConvert<ResAccountDto, AccountsEntity> mapperConvert;
+    private final GetInfoCustomerGrpcImp getInfoCustomerGrpcImp;
 
     @Override
-    public Flux<AccountDTO> getAll() {
+    public Flux<ResAccountDto> getAll() {
         return accountRepository.findAll()
-                .map(listAccount -> mapperConvert.toDTO(listAccount, AccountDTO.class))
+                .flatMap(accounts -> getInfoCustomerGrpcImp.getInfoCustomer(accounts.getCustomerId().toString())
+                        .map(listAccount -> {
+                            ResAccountDto resAccountDto = mapperConvert.toDTO(accounts, ResAccountDto.class);
+                            resAccountDto.setNames(listAccount.getName());
+                            return resAccountDto;
+                        }))
                 .switchIfEmpty(Flux.empty());
     }
 }

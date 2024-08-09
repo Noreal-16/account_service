@@ -1,4 +1,4 @@
-package org.account_movement_service.account_movement_service.application.dto;
+package org.account_movement_service.account_movement_service.application.dto.movementDto;
 
 import lombok.AccessLevel;
 import lombok.Data;

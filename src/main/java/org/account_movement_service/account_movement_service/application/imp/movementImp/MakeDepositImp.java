@@ -2,13 +2,14 @@ package org.account_movement_service.account_movement_service.application.imp.mo
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.DepositDTO;
-import org.account_movement_service.account_movement_service.application.dto.MovementDTO;
+import org.account_movement_service.account_movement_service.application.dto.movementDto.DepositDTO;
+import org.account_movement_service.account_movement_service.application.dto.movementDto.MovementDTO;
 import org.account_movement_service.account_movement_service.application.imp.accountImp.GetInfoAccountByAccountNumberImp;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.GetMovementByAccountIdService;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeDepositService;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.RegisterMovementService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -21,6 +22,7 @@ public class MakeDepositImp implements MakeDepositService {
     private final GetMovementByAccountIdService getMovementByAccountId;
 
 
+    @Transactional
     @Override
     public Mono<MovementDTO> makeDeposit(DepositDTO depositDTO) {
         return getAccountNumber.getInfoAccountByAccountNumber(depositDTO.getDepositAccount())

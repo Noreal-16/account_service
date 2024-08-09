@@ -2,6 +2,6 @@ package org.account_movement_service.account_movement_service.application.interf
 
 import reactor.core.publisher.Mono;
 
-public interface BaseRegisterService<T> {
-    Mono<T> register(T data);
+public interface BaseRegisterService<T,R> {
+    Mono<T> register(R data);
 }

@@ -2,7 +2,7 @@ package org.account_movement_service.account_movement_service.application.imp.ac
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.accountDto.AccountDTO;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.UpdateAccountService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
 import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;

@@ -3,6 +3,7 @@ package org.account_movement_service.account_movement_service.infrastructure.grp
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.client_person_service.client_person_service.grpc.CustomerRequire;
+import org.client_person_service.client_person_service.grpc.CustomerRequireByAccount;
 import org.client_person_service.client_person_service.grpc.CustomerResponse;
 import org.client_person_service.client_person_service.grpc.CustomerServiceGrpc;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,16 @@ public class GetInfoCustomerGrpcImp {
             CustomerRequire request = CustomerRequire.newBuilder()
                     .setId(customerId)
                     .build();
-            return customerServiceStub.getInfoCustomer(request);
+            return customerServiceStub.getInfoCustomerById(request);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<CustomerResponse> getInfoCustomerByIdentification(String identification) {
+        return Mono.fromCallable(() -> {
+            CustomerRequireByAccount request = CustomerRequireByAccount.newBuilder()
+                    .setIdentification(identification)
+                    .build();
+            return customerServiceStub.getInfoCustomerByAccount(request);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

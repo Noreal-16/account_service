@@ -2,7 +2,8 @@ package org.account_movement_service.account_movement_service.application.imp.ac
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.accountDto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.RegisterAccountService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
 import org.account_movement_service.account_movement_service.infrastructure.grpc.GetInfoCustomerGrpcImp;
@@ -19,21 +20,26 @@ import reactor.core.publisher.Mono;
 public class RegisterAccountImp implements RegisterAccountService {
 
     private final AccountRepository accountRepository;
-    private final MapperConvert<AccountDTO, AccountsEntity> mapperConvert;
-    private GetInfoCustomerGrpcImp getInfoCustomerGrpcImp;
+    private final MapperConvert<ResAccountDto, AccountsEntity> mapperConvert;
+    private final MapperConvert<AccountDTO, AccountsEntity> mapperAccountConvert;
+    private final GetInfoCustomerGrpcImp getInfoCustomerGrpcImp;
 
     @Override
-    public Mono<AccountDTO> register(AccountDTO data) {
-        return getInfoCustomerGrpcImp.getInfoCustomer(data.getCustomerId().toString())
+    public Mono<ResAccountDto> register(AccountDTO data) {
+        return getInfoCustomerGrpcImp.getInfoCustomerByIdentification(data.getIdentification())
                 .flatMap(customerEntity -> {
                     if (customerEntity != null) {
-                        AccountsEntity accountsEntity = mapperConvert.toENTITY(data, AccountsEntity.class);
+                        AccountsEntity accountsEntity = mapperAccountConvert.toENTITY(data, AccountsEntity.class);
                         accountsEntity.setStatus(true);
                         accountsEntity.setCustomerId(Long.parseLong(customerEntity.getId()));
                         return accountRepository.save(accountsEntity)
-                                .map(accountSave -> mapperConvert.toDTO(accountSave, AccountDTO.class));
+                                .map(accountSave -> {
+                                    ResAccountDto responseDto = mapperConvert.toDTO(accountSave, ResAccountDto.class);
+                                    responseDto.setNames(customerEntity.getName());
+                                    return responseDto;
+                                });
                     } else {
-                        return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found"));
+                        return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente no se encuentra registrado"));
                     }
                 });
     }
