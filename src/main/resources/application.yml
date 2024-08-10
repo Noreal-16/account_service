@@ -2,9 +2,13 @@ spring:
   application:
     name: account_movement_service
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/banck
-    username: postgres
-    password: javacoffe343569
+    url: r2dbc:h2:mem:///testdb
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
 server:
   port: 8082
@@ -21,5 +25,5 @@ springdoc:
 api:
   base:
     grpc:
-      url: client_person_service
+      url: localhost
       port: 9090

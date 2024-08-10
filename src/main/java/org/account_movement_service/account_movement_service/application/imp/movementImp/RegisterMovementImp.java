@@ -22,7 +22,7 @@ public class RegisterMovementImp implements RegisterMovementService {
     @Override
     public Mono<MovementDTO> registerMovement(Long accountId, Double amount, Double newBalance) {
         MovementsEntity movement = new MovementsEntity();
-        movement.setMovementType(amount < 0 ? MovementsEnums.DEBIT.toString() : MovementsEnums.CREDIT.toString());
+        movement.setMovementType(amount < 0 ? MovementsEnums.DEBIT + "of" + amount : MovementsEnums.CREDIT + "of" + amount);
         movement.setBalance(newBalance);
         movement.setAmount(amount);
         movement.setAccountId(accountId);
