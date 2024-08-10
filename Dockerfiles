@@ -1,0 +1,9 @@
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY build/libs/microservice-2.jar account_movement_service.jar
+
+EXPOSE 8082
+
+ENTRYPOINT ["java", "-jar", "account_movement_service.jar"]
