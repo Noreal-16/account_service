@@ -1,19 +1,19 @@
 package org.account_movement_service.account_movement_service.infrastructure.utils;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class DateUtils {
-    public static Date convertToDateViaInstant(LocalDate dateToConvert) {
-        return java.util.Date.from(dateToConvert.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-    }
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    public static LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+    public static Date parseDate(String dateStr) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            return dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            throw new RuntimeException("Invalid date format: " + dateStr, e);
+        }
     }
 }

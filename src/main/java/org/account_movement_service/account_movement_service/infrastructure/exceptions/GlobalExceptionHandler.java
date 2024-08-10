@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<ErrorResponseCustomer> handleGeneralException(Exception ex) {
-        ErrorResponseCustomer errorResponse = new ErrorResponseCustomer("INTERNAL_SERVER_ERROR", "An unexpected error occurred");
+        ErrorResponseCustomer errorResponse = new ErrorResponseCustomer("INTERNAL_SERVER_ERROR", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

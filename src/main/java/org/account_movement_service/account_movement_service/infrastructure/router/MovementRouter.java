@@ -19,6 +19,7 @@ public class MovementRouter {
         return RouterFunctions.route()
                 .POST(PATH + "/deposit", movementsHandler::makeDeposit)
                 .POST(PATH + "/transfer", movementsHandler::makeTransfer)
+                .GET("/reports/{customer-id}", movementsHandler::reportMovement)
                 .build();
     }
 
