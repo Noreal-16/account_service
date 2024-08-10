@@ -2,6 +2,7 @@ package org.account_movement_service.account_movement_service.infrastructure.rou
 
 import lombok.extern.slf4j.Slf4j;
 import org.account_movement_service.account_movement_service.infrastructure.handler.AccountHandler;
+import org.account_movement_service.account_movement_service.infrastructure.router.docs.AccountsOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -14,6 +15,7 @@ public class AccountRouter {
     private static final String PATH = "/api/v1/accounts";
 
     @Bean
+    @AccountsOpenApi
     RouterFunction<ServerResponse> accountRoutes(AccountHandler accountHandler) {
         return RouterFunctions.route()
                 .GET(PATH, accountHandler::getAllHandler)
