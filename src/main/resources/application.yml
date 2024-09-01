@@ -2,14 +2,10 @@ spring:
   application:
     name: account_movement_service
   r2dbc:
-    url: r2dbc:h2:mem:///testdb
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
+    url: r2dbc:postgresql://localhost:5432/testdb
+    username: postgres
+    password: postgres
+# Cambiar a IP de contenedor para BD
 server:
   port: 8082
 
