@@ -2,36 +2,34 @@ package org.account_movement_service.account_movement_service.application.imp.mo
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.accountDto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.dto.movementDto.DepositDTO;
 import org.account_movement_service.account_movement_service.application.dto.movementDto.MovementDTO;
+import org.account_movement_service.account_movement_service.application.dto.movementDto.ResReportDto;
 import org.account_movement_service.account_movement_service.application.dto.movementDto.TransferDTO;
 import org.account_movement_service.account_movement_service.application.imp.accountImp.GetInfoAccountByAccountNumberImp;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.GetMovementByAccountIdService;
-import org.account_movement_service.account_movement_service.application.interfaces.movementService.MakeTransferService;
+import org.account_movement_service.account_movement_service.application.interfaces.movementService.MovementService;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.RegisterMovementService;
-import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
-import org.account_movement_service.account_movement_service.domain.movements.MovementsEntity;
 import org.account_movement_service.account_movement_service.infrastructure.exceptions.CustomException;
-import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
+import org.account_movement_service.account_movement_service.infrastructure.grpc.GetInfoCustomerGrpcImp;
 import org.account_movement_service.account_movement_service.infrastructure.repository.MovementRepository;
-import org.account_movement_service.account_movement_service.infrastructure.utils.MapperConvert;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDate;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class MakeTransferImp implements MakeTransferService {
-
-    private final MovementRepository movementRepository;
-    private final AccountRepository accountRepository;
-    private final MapperConvert<MovementDTO, MovementsEntity> mapperConvert;
-    private final MapperConvert<AccountDTO, AccountsEntity> accountsEntityMapper;
-    private final RegisterMovementService registerMovement;
+public class MovementServiceImp implements MovementService {
+    private final RegisterMovementService registerMovementService;
     private final GetInfoAccountByAccountNumberImp getAccountNumber;
     private final GetMovementByAccountIdService getMovementByAccountId;
-
+    private final RegisterMovementService registerMovement;
+    private final MovementRepository movementRepository;
+    private final GetInfoCustomerGrpcImp getInfoCustomerGrpcImp;
 
     @Override
     public Mono<MovementDTO> makeTransfer(TransferDTO transferDTO) {
@@ -67,9 +65,33 @@ public class MakeTransferImp implements MakeTransferService {
                 });
     }
 
-
     private Boolean validateAccount(String originAccount, String destinationAccount) {
         return destinationAccount.equals(originAccount);
     }
 
+
+    @Override
+    public Mono<MovementDTO> makeDeposit(DepositDTO depositDTO) {
+        return getAccountNumber.getInfoAccountByAccountNumber(depositDTO.getDepositAccount())
+                .flatMap(existAccount -> getMovementByAccountId.getMovementByAccountId(existAccount.getId())
+                        .defaultIfEmpty(new MovementDTO())
+                        .flatMap(movementExist -> {
+                            Double firstMovementAmount = movementExist.getId() == null ? existAccount.getInitialBalance() : movementExist.getBalance();
+                            Double newBalance = firstMovementAmount + depositDTO.getAmount();
+                            return registerMovementService.registerMovement(existAccount.getId(), depositDTO.getAmount(), newBalance)
+                                    .doOnSuccess(movement -> log.info("Se registro correctamente la transacción"));
+                        }));
+    }
+
+    @Override
+    public Flux<ResReportDto> getReport(Long accountId, LocalDate startDate, LocalDate endDate) {
+        return getInfoCustomerGrpcImp.getInfoCustomer(accountId.toString())
+                .switchIfEmpty(Mono.error(new CustomException("No se encontraron movimientos para el cliente especificado.", HttpStatus.NOT_FOUND)))
+                .flatMapMany(customer -> movementRepository.findInfoReport(accountId, startDate, endDate)
+                        .map(report -> {
+                            log.info(report.toString());
+                            report.setNames(customer.getName());
+                            return report;
+                        })).switchIfEmpty(Flux.empty());
+    }
 }

@@ -1,4 +1,4 @@
-package org.account_movement_service.account_movement_service.infrastructure.router.docs;
+package org.account_movement_service.account_movement_service.infrastructure.utils.docs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

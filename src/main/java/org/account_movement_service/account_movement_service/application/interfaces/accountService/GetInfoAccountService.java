@@ -1,8 +1,0 @@
-package org.account_movement_service.account_movement_service.application.interfaces.accountService;
-
-import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
-import org.account_movement_service.account_movement_service.application.interfaces.genericService.BaseGetInfoService;
-
-public interface GetInfoAccountService extends BaseGetInfoService<ResAccountDto> {
-
-}
