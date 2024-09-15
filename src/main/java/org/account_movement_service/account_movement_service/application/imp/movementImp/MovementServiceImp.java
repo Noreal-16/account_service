@@ -2,10 +2,10 @@ package org.account_movement_service.account_movement_service.application.imp.mo
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.movementDto.DepositDTO;
-import org.account_movement_service.account_movement_service.application.dto.movementDto.MovementDTO;
-import org.account_movement_service.account_movement_service.application.dto.movementDto.ResReportDto;
-import org.account_movement_service.account_movement_service.application.dto.movementDto.TransferDTO;
+import org.account_movement_service.account_movement_service.application.imp.movementImp.dto.DepositDTO;
+import org.account_movement_service.account_movement_service.application.imp.movementImp.dto.MovementDTO;
+import org.account_movement_service.account_movement_service.application.imp.movementImp.dto.ResReportDto;
+import org.account_movement_service.account_movement_service.application.imp.movementImp.dto.TransferDTO;
 import org.account_movement_service.account_movement_service.application.imp.accountImp.GetInfoAccountByAccountNumberImp;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.GetMovementByAccountIdService;
 import org.account_movement_service.account_movement_service.application.interfaces.movementService.MovementService;

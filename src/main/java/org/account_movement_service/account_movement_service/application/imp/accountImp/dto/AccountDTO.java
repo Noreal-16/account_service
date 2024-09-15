@@ -1,4 +1,4 @@
-package org.account_movement_service.account_movement_service.application.dto.accountDto;
+package org.account_movement_service.account_movement_service.application.imp.accountImp.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

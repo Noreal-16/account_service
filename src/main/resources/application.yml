@@ -2,7 +2,7 @@ spring:
   application:
     name: account_movement_service
   r2dbc:
-    url: r2dbc:postgresql://dbPostgres:5433/testdb
+    url: r2dbc:postgresql://localhost:5432/testdb
     username: postgres
     password: postgres
 # Cambiar a IP de contenedor para BD
@@ -23,3 +23,8 @@ api:
     grpc:
       url: localhost
       port: 9090
+
+uri:
+  base:
+    http:
+      url: http://localhost:7070

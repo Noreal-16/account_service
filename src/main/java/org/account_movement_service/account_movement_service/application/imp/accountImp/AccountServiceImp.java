@@ -2,12 +2,12 @@ package org.account_movement_service.account_movement_service.application.imp.ac
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.accountDto.AccountDTO;
-import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
+import org.account_movement_service.account_movement_service.application.imp.accountImp.dto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.imp.accountImp.dto.ResAccountDto;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.AccountService;
+import org.account_movement_service.account_movement_service.application.interfaces.customerService.CustomerService;
 import org.account_movement_service.account_movement_service.domain.accounts.AccountsEntity;
 import org.account_movement_service.account_movement_service.infrastructure.exceptions.CustomException;
-import org.account_movement_service.account_movement_service.infrastructure.grpc.GetInfoCustomerGrpcImp;
 import org.account_movement_service.account_movement_service.infrastructure.repository.AccountRepository;
 import org.account_movement_service.account_movement_service.infrastructure.utils.MapperConvert;
 import org.springframework.http.HttpStatus;
@@ -23,12 +23,12 @@ public class AccountServiceImp implements AccountService {
     private final AccountRepository accountRepository;
     private final MapperConvert<ResAccountDto, AccountsEntity> mapperConvert;
     private final MapperConvert<AccountDTO, AccountsEntity> mapperAccountConvert;
-    private final GetInfoCustomerGrpcImp getInfoCustomerGrpcImp;
+    private final CustomerService customerService;
 
     @Override
     public Flux<ResAccountDto> getAll() {
         return accountRepository.findAll()
-                .flatMap(accounts -> getInfoCustomerGrpcImp.getInfoCustomer(accounts.getCustomerId().toString())
+                .flatMap(accounts -> customerService.getInfoCustomerById(accounts.getCustomerId())
                         .map(listAccount -> {
                             ResAccountDto resAccountDto = mapperConvert.toDTO(accounts, ResAccountDto.class);
                             resAccountDto.setNames(listAccount.getName());
@@ -41,7 +41,7 @@ public class AccountServiceImp implements AccountService {
     public Mono<ResAccountDto> getInfo(Long id) {
         return accountRepository.findById(id)
                 .switchIfEmpty(Mono.error(new CustomException("No se encontro cuenta con el id: " + id, HttpStatus.NOT_FOUND)))
-                .flatMap(account -> getInfoCustomerGrpcImp.getInfoCustomer(account.getCustomerId().toString())
+                .flatMap(account -> customerService.getInfoCustomerById(account.getCustomerId())
                         .map(customerDto -> {
                             ResAccountDto resAccountDto = mapperConvert.toDTO(account, ResAccountDto.class);
                             resAccountDto.setNames(customerDto.getName());
@@ -53,13 +53,13 @@ public class AccountServiceImp implements AccountService {
 
     @Override
     public Mono<ResAccountDto> register(AccountDTO data) {
-        return getInfoCustomerGrpcImp.getInfoCustomerByIdentification(data.getIdentification())
+        return customerService.getInfoCustomerByIdentification(data.getIdentification())
                 .switchIfEmpty(Mono.error(new CustomException("Cliente no se encuentra registrado", HttpStatus.NOT_FOUND)))
                 .flatMap(customerEntity -> {
                     if (customerEntity != null) {
                         AccountsEntity accountsEntity = mapperAccountConvert.toENTITY(data, AccountsEntity.class);
                         accountsEntity.setStatus(true);
-                        accountsEntity.setCustomerId(Long.parseLong(customerEntity.getId()));
+                        accountsEntity.setCustomerId(Long.parseLong(customerEntity.getId().toString()));
                         return accountRepository.save(accountsEntity)
                                 .map(accountSave -> {
                                     ResAccountDto responseDto = mapperConvert.toDTO(accountSave, ResAccountDto.class);

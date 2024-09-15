@@ -2,8 +2,8 @@ package org.account_movement_service.account_movement_service.infrastructure.con
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.account_movement_service.account_movement_service.application.dto.accountDto.AccountDTO;
-import org.account_movement_service.account_movement_service.application.dto.accountDto.ResAccountDto;
+import org.account_movement_service.account_movement_service.application.imp.accountImp.dto.AccountDTO;
+import org.account_movement_service.account_movement_service.application.imp.accountImp.dto.ResAccountDto;
 import org.account_movement_service.account_movement_service.application.interfaces.accountService.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,9 +43,9 @@ public class AccountController {
         return accountService.update(id, data);
     }
 
-    @PutMapping("/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Mono<Void> updateAccount(@PathVariable Long id) {
+    public Mono<Void> deleteAccount(@PathVariable Long id) {
         return accountService.delete(id);
     }
 }

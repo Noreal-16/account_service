@@ -1,4 +1,4 @@
-package org.account_movement_service.account_movement_service.application.dto.customerDto;
+package org.account_movement_service.account_movement_service.application.imp.customerImp.dto;
 
 import lombok.Data;
 

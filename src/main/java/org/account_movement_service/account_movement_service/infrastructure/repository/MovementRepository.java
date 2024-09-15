@@ -1,6 +1,6 @@
 package org.account_movement_service.account_movement_service.infrastructure.repository;
 
-import org.account_movement_service.account_movement_service.application.dto.movementDto.ResReportDto;
+import org.account_movement_service.account_movement_service.application.imp.movementImp.dto.ResReportDto;
 import org.account_movement_service.account_movement_service.domain.movements.MovementsEntity;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
